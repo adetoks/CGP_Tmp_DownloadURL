@@ -71,3 +71,34 @@ the end of the output.
 
 ---
 
+## Cloudflare MCP smoke test
+
+The Cloudflare MCP server was tested locally with the published
+`@cloudflare/mcp-server-cloudflare` package. The server starts, but it cannot
+serve account tools until Wrangler has authenticated a Cloudflare account.
+This checkout deliberately contains no Cloudflare credentials or account IDs,
+so the test did not create, modify, or inspect any Cloudflare resources.
+
+To connect the MCP server to your own account:
+
+```bash
+# Opens the Cloudflare login flow and writes Wrangler's local credentials.
+npx wrangler login
+
+# Replace the placeholder with your Cloudflare account ID, then start the
+# standard-input/standard-output MCP server for an MCP-capable client.
+npx @cloudflare/mcp-server-cloudflare run <CLOUDFLARE_ACCOUNT_ID>
+```
+
+For a protocol-level smoke test after authentication, send `initialize`,
+`notifications/initialized`, and `tools/list` JSON-RPC messages through the
+server. A successful `tools/list` response confirms that the client can
+discover the available Cloudflare tools. Keep account IDs and API tokens out
+of this repository.
+
+The unauthenticated test produced Wrangler's expected `You are not
+authenticated` response, and the MCP server reported that no Wrangler config
+file was available. This environment therefore still needs authentication and
+an account ID before it can make authenticated Cloudflare MCP tool calls.
+
+---
